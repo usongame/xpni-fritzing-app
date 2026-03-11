@@ -37,7 +37,7 @@ jobs:
     
     - name: Install dependencies
       run: |
-        brew install boost automake bison cmake
+        brew install boost automake bison cmake libtool
         # 从源码构建 libgit2
         cd libs/libgit2-1.7.1
         mkdir -p build && cd build
