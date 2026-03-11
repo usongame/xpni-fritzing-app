@@ -42,7 +42,7 @@ jobs:
       shell: powershell
       run: |
         # Install dependencies via vcpkg
-        vcpkg install boost:x64-windows-static libgit2:x64-windows-static || true
+        try { vcpkg install boost:x64-windows-static libgit2:x64-windows-static } catch { Write-Host "vcpkg install failed, continuing..." }
         # Note: quazip and ngspice may need manual build on Windows
     
     - name: Build quazip
