@@ -71,7 +71,17 @@ jobs:
     - name: Build Fritzing
       run: |
         qmake phoenix.pro
-        make -j$(sysctl -n hw.ncpu) 2>&1 | tee build.log || true
+        make -j$(sysctl -n hw.ncpu) 2>&1 | tee build.log
+    
+    - name: Debug build output
+      if: always()
+      run: |
+        echo "=== Checking build output ==="
+        ls -la release64/ 2>/dev/null || echo "release64/ not found"
+        ls -la release64/Fritzing.app/ 2>/dev/null || echo "Fritzing.app not found"
+        ls -la release64/Fritzing.app/Contents/ 2>/dev/null || echo "Contents not found"
+        ls -la release64/Fritzing.app/Contents/MacOS/ 2>/dev/null || echo "MacOS not found"
+        find release64 -name "Fritzing" -type f 2>/dev/null || echo "Fritzing binary not found"
     
     - name: Upload build log
       if: always()
