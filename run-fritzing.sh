@@ -4,6 +4,9 @@
 # 获取脚本所在目录
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
+# 编译输出在父目录 release64/ 中
+RELEASE_DIR="$(dirname "$SCRIPT_DIR")/release64"
+
 # 设置资源路径
 FRITZING_PARTS="$SCRIPT_DIR/fritzing-parts"
 
@@ -13,9 +16,10 @@ OS="$(uname -s)"
 case "$OS" in
     Darwin*)
         # macOS
-        FRITZING_APP="$SCRIPT_DIR/release64/Fritzing.app/Contents/MacOS/Fritzing"
+        FRITZING_APP="$RELEASE_DIR/Fritzing.app/Contents/MacOS/Fritzing"
         if [ ! -f "$FRITZING_APP" ]; then
             echo "错误: 找不到 Fritzing 可执行文件"
+            echo "路径: $FRITZING_APP"
             echo "请确保已经编译 Fritzing"
             exit 1
         fi
@@ -24,9 +28,10 @@ case "$OS" in
         ;;
     Linux*)
         # Linux
-        FRITZING_BIN="$SCRIPT_DIR/release64/Fritzing"
+        FRITZING_BIN="$RELEASE_DIR/Fritzing"
         if [ ! -f "$FRITZING_BIN" ]; then
             echo "错误: 找不到 Fritzing 可执行文件"
+            echo "路径: $FRITZING_BIN"
             echo "请确保已经编译 Fritzing"
             exit 1
         fi
