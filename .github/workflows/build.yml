@@ -58,59 +58,22 @@ jobs:
         mkdir -p ../quazip-6.5.3-1.4/include/quazip
         cp ../quazip/*.h ../quazip-6.5.3-1.4/include/quazip/
     
-    - name: Create ngspice header and library
+    - name: Clone and build ngspice
       run: |
-        # 创建 ngspice 目录结构
-        mkdir -p libs/ngspice-42/lib libs/ngspice-42/include/ngspice
-        
-        # 创建 stub 头文件
-        echo '/* ngspice stub header for CI build */' > libs/ngspice-42/include/ngspice/sharedspice.h
-        echo '#ifndef NGSPICE_SHAREDSPICE_H' >> libs/ngspice-42/include/ngspice/sharedspice.h
-        echo '#define NGSPICE_SHAREDSPICE_H' >> libs/ngspice-42/include/ngspice/sharedspice.h
-        echo '' >> libs/ngspice-42/include/ngspice/sharedspice.h
-        echo '#ifdef __cplusplus' >> libs/ngspice-42/include/ngspice/sharedspice.h
-        echo 'extern "C" {' >> libs/ngspice-42/include/ngspice/sharedspice.h
-        echo '#endif' >> libs/ngspice-42/include/ngspice/sharedspice.h
-        echo '' >> libs/ngspice-42/include/ngspice/sharedspice.h
-        echo 'typedef struct vecvalues { char* name; double value; } vecvalues, *pvecvalues;' >> libs/ngspice-42/include/ngspice/sharedspice.h
-        echo 'typedef struct vecvaluesall { int veccount; pvecvalues vecsa; } vecvaluesall, *pvecvaluesall;' >> libs/ngspice-42/include/ngspice/sharedspice.h
-        echo 'typedef struct vecinfo { int number; char* name; } vecinfo, *pvecinfo;' >> libs/ngspice-42/include/ngspice/sharedspice.h
-        echo 'typedef struct vecinfoall { char* name; int veccount; } vecinfoall, *pvecinfoall;' >> libs/ngspice-42/include/ngspice/sharedspice.h
-        echo 'typedef struct vector_info { char* name; int type; int length; double* data; } vector_info, *pvector_info;' >> libs/ngspice-42/include/ngspice/sharedspice.h
-        echo '' >> libs/ngspice-42/include/ngspice/sharedspice.h
-        echo 'typedef int (*SendChar)(char*, int, void*);' >> libs/ngspice-42/include/ngspice/sharedspice.h
-        echo 'typedef int (*SendStat)(char*, int, void*);' >> libs/ngspice-42/include/ngspice/sharedspice.h
-        echo 'typedef int (*ControlledExit)(int, int, int, int, void*);' >> libs/ngspice-42/include/ngspice/sharedspice.h
-        echo 'typedef int (*SendData)(pvecvaluesall, int, int, void*);' >> libs/ngspice-42/include/ngspice/sharedspice.h
-        echo 'typedef int (*SendInitData)(pvecinfoall, int, void*);' >> libs/ngspice-42/include/ngspice/sharedspice.h
-        echo 'typedef int (*BGThreadRunning)(int, int, void*);' >> libs/ngspice-42/include/ngspice/sharedspice.h
-        echo '' >> libs/ngspice-42/include/ngspice/sharedspice.h
-        echo 'int ngSpice_Init(SendChar* printfcn, SendStat* statfcn, ControlledExit* ngexit,' >> libs/ngspice-42/include/ngspice/sharedspice.h
-        echo '                 SendData* sdata, SendInitData* sinitdata, BGThreadRunning* bgtrun,' >> libs/ngspice-42/include/ngspice/sharedspice.h
-        echo '                 void* userData);' >> libs/ngspice-42/include/ngspice/sharedspice.h
-        echo 'int ngSpice_Command(char* command);' >> libs/ngspice-42/include/ngspice/sharedspice.h
-        echo 'int ngSpice_Running(void);' >> libs/ngspice-42/include/ngspice/sharedspice.h
-        echo 'int ngSpice_Init_Sync(SendData* sdata, SendInitData* sinitdata,' >> libs/ngspice-42/include/ngspice/sharedspice.h
-        echo '                      BGThreadRunning* bgtrun, int* libid, void* userData);' >> libs/ngspice-42/include/ngspice/sharedspice.h
-        echo 'int ngSpice_Circ(char** circarray);' >> libs/ngspice-42/include/ngspice/sharedspice.h
-        echo 'pvector_info ngGet_Vec_Info(char* vecname);' >> libs/ngspice-42/include/ngspice/sharedspice.h
-        echo '' >> libs/ngspice-42/include/ngspice/sharedspice.h
-        echo '#ifdef __cplusplus' >> libs/ngspice-42/include/ngspice/sharedspice.h
-        echo '}' >> libs/ngspice-42/include/ngspice/sharedspice.h
-        echo '#endif' >> libs/ngspice-42/include/ngspice/sharedspice.h
-        echo '' >> libs/ngspice-42/include/ngspice/sharedspice.h
-        echo '#endif' >> libs/ngspice-42/include/ngspice/sharedspice.h
-        
-        # 创建 stub 库文件
-        echo 'int ngSpice_Init() { return 0; }' > /tmp/ngspice_stub.c
-        echo 'int ngSpice_Command() { return 0; }' >> /tmp/ngspice_stub.c
-        echo 'int ngSpice_Running() { return 0; }' >> /tmp/ngspice_stub.c
-        echo 'int ngSpice_Init_Sync() { return 0; }' >> /tmp/ngspice_stub.c
-        echo 'int ngSpice_Circ() { return 0; }' >> /tmp/ngspice_stub.c
-        echo 'void* ngGet_Vec_Info() { return 0; }' >> /tmp/ngspice_stub.c
-        
-        gcc -dynamiclib -fPIC /tmp/ngspice_stub.c -o libs/ngspice-42/lib/libngspice.dylib
-        ln -sf libngspice.dylib libs/ngspice-42/lib/libngspice.0.dylib
+        # 克隆 ngspice 源码
+        rm -rf libs/ngspice-42
+        git clone --depth 1 https://git.code.sf.net/p/ngspice/ngspice libs/ngspice-42
+        cd libs/ngspice-42
+        # 构建 ngspice
+        ./autogen.sh
+        mkdir -p release-sh && cd release-sh
+        ../configure --with-ngshared --enable-cider --disable-openmp
+        make -j$(sysctl -n hw.ncpu)
+        # 安装到本地目录
+        mkdir -p ../lib ../include/ngspice
+        cp src/.libs/libngspice.0.dylib ../lib/
+        cp ../include/ngspice/sharedspice.h ../include/ngspice/ 2>/dev/null || \
+          find . -name "sharedspice.h" -exec cp {} ../include/ngspice/ \;
     
     - name: Build Fritzing
       run: |

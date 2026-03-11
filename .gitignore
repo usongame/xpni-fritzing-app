@@ -52,40 +52,39 @@ qrc_*.cpp
 # Compiled translation files
 *.qm
 
-# Dependency directories
-# 注意：libs 目录中的源码保留，但编译生成的文件忽略
+# Dependency directories - 只忽略编译生成的文件，保留源码
+# libs 目录中的构建目录
 libs/**/build/
 libs/**/release-sh/
 libs/**/release/
 libs/**/debug/
 libs/**/install/
-libs/**/*.o
-libs/**/*.a
-libs/**/*.so
-libs/**/*.so.*
-libs/**/*.dylib
-libs/**/*.dll
 
-# 保留 libs 中的源码和头文件
+# libs 中的编译产物（但保留 lib/ 目录中的源码和头文件）
+libs/**/*.o
+libs/**/*.obj
+
+# 保留 libs 中的源码、头文件和已编译的库
 !libs/**/include/
 !libs/**/*.h
 !libs/**/*.hpp
 !libs/**/*.c
 !libs/**/*.cpp
-
-# 但忽略压缩包（可以从网络下载）
-libs/**/*.tar.gz
-libs/**/*.tar.bz2
-libs/**/*.tar.xz
-libs/**/*.zip
-
-# 保留必要的库文件（已编译的依赖）
+!libs/**/*.cc
+!libs/**/*.cxx
+!libs/**/lib/
 !libs/**/lib/*.a
 !libs/**/lib/*.lib
 !libs/**/lib/*.so
 !libs/**/lib/*.so.*
 !libs/**/lib/*.dylib
 !libs/**/lib/*.dll
+
+# 忽略压缩包（可以从网络下载）
+libs/**/*.tar.gz
+libs/**/*.tar.bz2
+libs/**/*.tar.xz
+libs/**/*.zip
 
 # Docker 构建相关
 Dockerfile.*
@@ -146,7 +145,6 @@ yarn-error.log*
 __pycache__/
 *.py[cod]
 *$py.class
-*.so
 .Python
 env/
 venv/
