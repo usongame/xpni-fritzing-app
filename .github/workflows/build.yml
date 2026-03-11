@@ -72,6 +72,11 @@ jobs:
       run: |
         qmake phoenix.pro
         make -j$(sysctl -n hw.ncpu) 2>&1 | tee build.log
+        # 检查 make 的退出码
+        if [ ${PIPESTATUS[0]} -ne 0 ]; then
+          echo "Build failed with errors!"
+          exit 1
+        fi
     
     - name: Debug build output
       if: always()
