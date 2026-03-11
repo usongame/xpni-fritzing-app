@@ -114,8 +114,8 @@ jobs:
         Remove-Item $packageName/fritzing-parts/.git -Recurse -Force -ErrorAction SilentlyContinue
         
         # Create README
-        @"
-Fritzing ${version} for Windows
+        $readmeContent = @"
+Fritzing $version for Windows
 
 Installation:
 1. Extract this ZIP file to any location
@@ -127,7 +127,8 @@ Features:
 - Circuit simulation with ngspice
 
 For more information, visit https://fritzing.org
-"@ | Out-File -FilePath "$packageName/README.txt" -Encoding UTF8
+"@
+        $readmeContent | Out-File -FilePath "$packageName/README.txt" -Encoding UTF8
         
         # Create ZIP
         Compress-Archive -Path $packageName -DestinationPath "${packageName}.zip" -Force
