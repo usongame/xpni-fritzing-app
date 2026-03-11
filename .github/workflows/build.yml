@@ -1,0 +1,137 @@
+name: Build Fritzing
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build-macos:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: recursive
+    
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v3
+      with:
+        version: '6.5.3'
+        host: 'mac'
+        target: 'desktop'
+        arch: 'clang_64'
+        modules: 'qt5compat'
+    
+    - name: Install dependencies
+      run: |
+        brew install boost libgit2 quazip ngspice automake bison
+    
+    - name: Build
+      run: |
+        qmake phoenix.pro
+        make -j$(sysctl -n hw.ncpu)
+    
+    - name: Create DMG
+      run: |
+        macdeployqt release64/Fritzing.app -dmg
+        mv release64/Fritzing.dmg Fritzing-macOS.dmg
+    
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: Fritzing-macOS
+        path: Fritzing-macOS.dmg
+
+  build-windows:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: recursive
+    
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v3
+      with:
+        version: '6.5.3'
+        host: 'windows'
+        target: 'desktop'
+        arch: 'win64_mingw'
+        modules: 'qt5compat'
+    
+    - name: Install dependencies
+      run: |
+        choco install boost-msvc-14.3
+        vcpkg install libgit2:x64-windows quazip:x64-windows
+    
+    - name: Build
+      shell: cmd
+      run: |
+        qmake phoenix.pro
+        mingw32-make -j4
+    
+    - name: Create ZIP
+      run: |
+        cd release64
+        7z a ../Fritzing-Windows.zip *
+    
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: Fritzing-Windows
+        path: Fritzing-Windows.zip
+
+  build-linux:
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: recursive
+    
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          build-essential \
+          qt6-base-dev \
+          qt6-tools-dev \
+          qt6-tools-dev-tools \
+          libqt6svg6-dev \
+          libgit2-dev \
+          libquazip1-qt6-dev \
+          libngspice0-dev \
+          cmake \
+          libgl1-mesa-dev
+    
+    - name: Build
+      run: |
+        qmake phoenix.pro
+        make -j$(nproc)
+    
+    - name: Create AppImage
+      run: |
+        wget https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage
+        chmod +x linuxdeployqt-continuous-x86_64.AppImage
+        
+        mkdir -p AppDir/usr/bin
+        cp release64/Fritzing AppDir/usr/bin/
+        cp -r fritzing-parts AppDir/usr/share/fritzing/
+        
+        ./linuxdeployqt-continuous-x86_64.AppImage \
+          AppDir/usr/bin/Fritzing \
+          -appimage
+        
+        mv Fritzing*.AppImage Fritzing-Linux.AppImage
+    
+    - name: Create tar.gz
+      run: |
+        tar -czf Fritzing-Linux.tar.gz release64/ fritzing-parts/ run-fritzing.sh
+    
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: Fritzing-Linux
+        path: |
+          Fritzing-Linux.AppImage
+          Fritzing-Linux.tar.gz

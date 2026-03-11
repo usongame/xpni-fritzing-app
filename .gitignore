@@ -1,0 +1,193 @@
+# Fritzing .gitignore
+
+# Build directories
+release64/
+debug64/
+release/
+debug/
+build/
+build-*/
+out/
+
+# Build artifacts
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.so.*
+*.dylib
+*.dll
+*.exe
+*.app
+Makefile
+Makefile.*
+.qmake.stash
+.qmake.cache
+
+# Qt generated files
+moc_*.cpp
+moc_*.h
+ui_*.h
+qrc_*.cpp
+*.moc
+*.pro.user
+*.pro.user.*
+*.qbs.user
+*.qbs.user.*
+*.moc
+*.qmlc
+*.jsc
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+*.sublime-project
+*.sublime-workspace
+
+# Compiled translation files
+*.qm
+
+# Dependency directories
+# 注意：libs 目录中的源码保留，但编译生成的文件忽略
+libs/**/build/
+libs/**/release-sh/
+libs/**/release/
+libs/**/debug/
+libs/**/install/
+libs/**/*.o
+libs/**/*.a
+libs/**/*.so
+libs/**/*.so.*
+libs/**/*.dylib
+libs/**/*.dll
+
+# 保留 libs 中的源码和头文件
+!libs/**/include/
+!libs/**/*.h
+!libs/**/*.hpp
+!libs/**/*.c
+!libs/**/*.cpp
+
+# 但忽略压缩包（可以从网络下载）
+libs/**/*.tar.gz
+libs/**/*.tar.bz2
+libs/**/*.tar.xz
+libs/**/*.zip
+
+# 保留必要的库文件（已编译的依赖）
+!libs/**/lib/*.a
+!libs/**/lib/*.lib
+!libs/**/lib/*.so
+!libs/**/lib/*.so.*
+!libs/**/lib/*.dylib
+!libs/**/lib/*.dll
+
+# Docker 构建相关
+Dockerfile.*
+build-windows-via-docker.sh
+build-windows-docker.sh
+
+# Distribution packages
+dist/
+*.dmg
+*.zip
+*.tar.gz
+*.tar.bz2
+*.AppImage
+*.deb
+*.rpm
+*.msi
+*.exe
+
+# User data（用户数据，不应该提交）
+user/
+*.fzz
+*.fz
+
+# Backup files
+*.bak
+*.backup
+*.orig
+*.rej
+
+# Log files
+*.log
+logs/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Test outputs
+test-results/
+coverage/
+*.gcov
+*.gcno
+*.gcda
+
+# Documentation builds
+docs/_build/
+docs/html/
+docs/latex/
+
+# Node modules (如果有前端工具)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# GitHub Actions 临时文件（如果有本地运行）
+.github/workflows/*.local.yml
+
+# 本地配置文件（可能包含敏感信息）
+config.local.ini
+settings.local.json
+.env
+.env.local
+
+# 忽略 fritzing-parts 中的生成文件
+fritzing-parts/parts.db
+fritzing-parts/**/*.db
+fritzing-parts/**/Thumbs.db
+
+# 但保留 fritzing-parts 的源码
+!fritzing-parts/bins/
+!fritzing-parts/core/
+!fritzing-parts/contrib/
+!fritzing-parts/scripts/
+!fritzing-parts/svg/
+!fritzing-parts/user/
+!fritzing-parts/*.md
+!fritzing-parts/*.txt
+!fritzing-parts/*.py
