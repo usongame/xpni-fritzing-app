@@ -64,8 +64,10 @@ jobs:
         rm -rf libs/ngspice-42
         git clone --depth 1 https://git.code.sf.net/p/ngspice/ngspice libs/ngspice-42
         cd libs/ngspice-42
-        # 使用 Homebrew 的 bison (3.8.x)
-        export PATH="/opt/homebrew/opt/bison/bin:$PATH"
+        # 使用 Homebrew 的 bison (3.8.x) - 优先使用 /usr/local 路径
+        export PATH="/usr/local/opt/bison/bin:/opt/homebrew/opt/bison/bin:$PATH"
+        which bison
+        bison --version
         # 构建 ngspice
         ./autogen.sh
         mkdir -p release-sh && cd release-sh
