@@ -23,7 +23,7 @@ jobs:
         host: 'mac'
         target: 'desktop'
         arch: 'clang_64'
-        modules: 'qt5compat'
+        modules: 'qt5compat qtserialport'
         cache: true
     
     - name: Cache dependencies
@@ -114,7 +114,7 @@ jobs:
         host: 'windows'
         target: 'desktop'
         arch: 'win64_mingw'
-        modules: 'qt5compat'
+        modules: 'qt5compat qtserialport'
         cache: true
     
     - name: Setup MSVC
@@ -165,30 +165,39 @@ jobs:
         host: 'linux'
         target: 'desktop'
         arch: 'gcc_64'
-        modules: 'qt5compat'
+        modules: 'qt5compat qtserialport'
         cache: true
     
     - name: Install dependencies
       run: |
         sudo apt-get update
-        # 添加 Qt 6 PPA
-        sudo apt-get install -y software-properties-common
-        sudo add-apt-repository -y ppa:okirby/qt6-backports || true
-        sudo apt-get update
-        # 安装依赖
+        # Ubuntu 22.04 已经有 Qt 6，不需要额外 PPA
         sudo apt-get install -y \
           build-essential \
           libgl1-mesa-dev \
           libgit2-dev \
-          libquazip1-qt6-1 \
-          libquazip1-qt6-dev \
           libngspice0-dev \
           cmake \
           wget \
           automake \
           bison \
           flex \
-          libqt6svg6-dev
+          libqt6svg6-dev \
+          qt6-serialport-dev \
+          libquazip1-qt6-dev || true
+        # 如果 quazip 包不存在，从源码构建
+        if ! dpkg -l | grep -q libquazip; then
+          echo "Building quazip from source..."
+          cd libs/quazip-1.4
+          mkdir -p build && cd build
+          cmake .. -DQUAZIP_QT_MAJOR_VERSION=6 -DCMAKE_BUILD_TYPE=Release
+          cmake --build . -- -j$(nproc)
+          mkdir -p ../quazip-6.5.3-1.4/lib
+          cp quazip/libquazip1-qt6.* ../quazip-6.5.3-1.4/lib/ 2>/dev/null || true
+          mkdir -p ../quazip-6.5.3-1.4/include/quazip
+          cp ../quazip/*.h ../quazip-6.5.3-1.4/include/quazip/
+          cd ../..
+        fi
     
     - name: Build Fritzing
       run: |
