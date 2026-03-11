@@ -15,7 +15,6 @@ jobs:
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v4
-      # 不使用 submodules，fritzing-parts 是普通目录
     
     - name: Install Qt
       uses: jurplel/install-qt-action@v4
@@ -38,7 +37,15 @@ jobs:
     
     - name: Install dependencies
       run: |
-        brew install boost libgit2 automake bison
+        brew install boost automake bison cmake
+        # 从源码构建 libgit2
+        cd libs/libgit2-1.7.1
+        mkdir -p build && cd build
+        cmake .. -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=Release
+        cmake --build . -- -j$(sysctl -n hw.ncpu)
+        mkdir -p ../lib
+        cp libgit2.a ../lib/
+        cd ../..
     
     - name: Build quazip
       run: |
@@ -99,7 +106,6 @@ jobs:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v4
-      # 不使用 submodules
     
     - name: Install Qt
       uses: jurplel/install-qt-action@v4
@@ -151,7 +157,6 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v4
-      # 不使用 submodules
     
     - name: Install Qt
       uses: jurplel/install-qt-action@v4
@@ -166,17 +171,24 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
+        # 添加 Qt 6 PPA
+        sudo apt-get install -y software-properties-common
+        sudo add-apt-repository -y ppa:okirby/qt6-backports || true
+        sudo apt-get update
+        # 安装依赖
         sudo apt-get install -y \
           build-essential \
           libgl1-mesa-dev \
           libgit2-dev \
+          libquazip1-qt6-1 \
           libquazip1-qt6-dev \
           libngspice0-dev \
           cmake \
           wget \
           automake \
           bison \
-          flex
+          flex \
+          libqt6svg6-dev
     
     - name: Build Fritzing
       run: |
