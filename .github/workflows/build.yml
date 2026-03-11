@@ -114,20 +114,15 @@ jobs:
         Remove-Item $packageName/fritzing-parts/.git -Recurse -Force -ErrorAction SilentlyContinue
         
         # Create README
-        $readmeContent = @"
-Fritzing $version for Windows
-
-Installation:
-1. Extract this ZIP file to any location
-2. Run Fritzing.exe
-
-Features:
-- Full circuit design and simulation
-- PCB layout
-- Circuit simulation with ngspice
-
-For more information, visit https://fritzing.org
-"@
+        $readmeContent = 'Fritzing ' + $version + ' for Windows' + "`n`n" +
+          'Installation:' + "`n" +
+          '1. Extract this ZIP file to any location' + "`n" +
+          '2. Run Fritzing.exe' + "`n`n" +
+          'Features:' + "`n" +
+          '- Full circuit design and simulation' + "`n" +
+          '- PCB layout' + "`n" +
+          '- Circuit simulation with ngspice' + "`n`n" +
+          'For more information, visit https://fritzing.org'
         $readmeContent | Out-File -FilePath "$packageName/README.txt" -Encoding UTF8
         
         # Create ZIP
