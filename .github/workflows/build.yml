@@ -41,8 +41,12 @@ jobs:
     - name: Install dependencies
       shell: powershell
       run: |
-        # Install dependencies via vcpkg
-        try { vcpkg install boost:x64-windows-static libgit2:x64-windows-static } catch { Write-Host "vcpkg install failed, continuing..." }
+        # Install dependencies via vcpkg (only libgit2, boost is optional)
+        Write-Host "Installing libgit2 via vcpkg..."
+        vcpkg install libgit2:x64-windows-static
+        if ($LASTEXITCODE -ne 0) {
+          Write-Host "vcpkg install failed, continuing without libgit2..."
+        }
     
     - name: Build zlib
       shell: powershell
