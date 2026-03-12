@@ -128,6 +128,31 @@ jobs:
           Write-Host "Circuit simulation will be disabled"
         }
     
+    - name: Build libgit2 from source
+      shell: powershell
+      run: |
+        # Build libgit2 from source since vcpkg path is not recognized
+        cd libs/libgit2-1.7.1
+        New-Item -ItemType Directory -Force -Path build
+        cd build
+        
+        cmake .. `
+          -DCMAKE_BUILD_TYPE=Release `
+          -DBUILD_SHARED_LIBS=OFF `
+          -DBUILD_TESTS=OFF `
+          -DBUILD_CLI=OFF
+        
+        cmake --build . --config Release --parallel $env:NUMBER_OF_PROCESSORS
+        
+        # Copy to expected location
+        New-Item -ItemType Directory -Force -Path ../../libgit2/include
+        New-Item -ItemType Directory -Force -Path ../../libgit2/lib
+        Copy-Item Release/git2.lib ../../libgit2/lib/ -ErrorAction SilentlyContinue
+        Copy-Item ../include/git2 ../../libgit2/include/ -Recurse -ErrorAction SilentlyContinue
+        Copy-Item ../include/git2.h ../../libgit2/include/ -ErrorAction SilentlyContinue
+        
+        cd ../..
+    
     - name: Build Fritzing
       shell: cmd
       run: |
