@@ -162,12 +162,25 @@ jobs:
         
         cd $PWD
     
+    - name: Verify resources
+      shell: powershell
+      run: |
+        # Verify critical resource files exist
+        Write-Host "Checking resource files..."
+        if (Test-Path "resources/parts/core/power.fzp") {
+          Write-Host "✓ resources/parts/core/power.fzp exists"
+        } else {
+          Write-Host "✗ resources/parts/core/power.fzp NOT FOUND"
+        }
+        # List resources directory
+        Get-ChildItem resources/parts/core -Filter "*.fzp" | Select-Object -First 5
+    
     - name: Build Fritzing
       shell: cmd
       run: |
         call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
         qmake phoenix.pro CONFIG+=release
-        nmake /f Makefile.Release 2>&1
+        nmake /f Makefile.Release 2>&1 || exit /b 1
     
     - name: Deploy Qt dependencies
       shell: powershell
