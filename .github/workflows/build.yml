@@ -162,9 +162,12 @@ jobs:
         
         cd $PWD
     
-    - name: Verify resources
+    - name: Fix resource paths for Windows
       shell: powershell
-      run: Write-Host "Resources check"; if (Test-Path "resources/parts/core/power.fzp") { Write-Host "power.fzp exists" } else { Write-Host "power.fzp NOT FOUND" }
+      run: |
+        # Replace forward slashes with backslashes in qrc file for Windows
+        (Get-Content phoenixresources.qrc) -replace '/', '\' | Set-Content phoenixresources.qrc
+        Write-Host "Fixed qrc file path separators"
     
     - name: Build Fritzing
       shell: cmd
