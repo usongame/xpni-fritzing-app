@@ -164,16 +164,7 @@ jobs:
     
     - name: Verify resources
       shell: powershell
-      run: |
-        # Verify critical resource files exist
-        Write-Host "Checking resource files..."
-        if (Test-Path "resources/parts/core/power.fzp") {
-          Write-Host "OK: resources/parts/core/power.fzp exists"
-        } else {
-          Write-Host "ERROR: resources/parts/core/power.fzp NOT FOUND"
-        }
-        # List resources directory
-        Get-ChildItem resources/parts/core -Filter "*.fzp" | Select-Object -First 5
+      run: Write-Host "Resources check"; if (Test-Path "resources/parts/core/power.fzp") { Write-Host "power.fzp exists" } else { Write-Host "power.fzp NOT FOUND" }
     
     - name: Build Fritzing
       shell: cmd
