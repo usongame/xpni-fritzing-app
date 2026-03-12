@@ -131,11 +131,15 @@ jobs:
     - name: Build libgit2 from source
       shell: powershell
       run: |
-        # Build libgit2 from source since vcpkg path is not recognized
-        $rootDir = $PWD
+        # Build libgit2 from source
+        # Fritzing expects libgit2 in parent directory: ../libgit2
+        $parentDir = (Get-Item $PWD).Parent.FullName
+        $libgit2Dir = "$parentDir/libgit2"
+        Write-Host "Building libgit2 in: $libgit2Dir"
+        
         cd libs/libgit2-1.7.1
-        New-Item -ItemType Directory -Force -Path build
-        cd build
+        New-Item -ItemType Directory -Force -Path build64
+        cd build64
         
         cmake .. `
           -DCMAKE_BUILD_TYPE=Release `
@@ -145,18 +149,18 @@ jobs:
         
         cmake --build . --config Release --parallel $env:NUMBER_OF_PROCESSORS
         
-        # Copy to expected location (project root/libgit2)
-        New-Item -ItemType Directory -Force -Path $rootDir/libgit2/include
-        New-Item -ItemType Directory -Force -Path $rootDir/libgit2/lib
-        Copy-Item Release/git2.lib $rootDir/libgit2/lib/ -ErrorAction SilentlyContinue
-        Copy-Item ../include/git2 $rootDir/libgit2/include/ -Recurse -ErrorAction SilentlyContinue
-        Copy-Item ../include/git2.h $rootDir/libgit2/include/ -ErrorAction SilentlyContinue
+        # Copy to expected location (parent directory/libgit2)
+        New-Item -ItemType Directory -Force -Path $libgit2Dir/include
+        New-Item -ItemType Directory -Force -Path $libgit2Dir/build64/Release
+        Copy-Item Release/git2.lib $libgit2Dir/build64/Release/ -ErrorAction SilentlyContinue
+        Copy-Item ../include/git2 $libgit2Dir/include/ -Recurse -ErrorAction SilentlyContinue
+        Copy-Item ../include/git2.h $libgit2Dir/include/ -ErrorAction SilentlyContinue
         
         # List what we created
         Write-Host "libgit2 files created:"
-        Get-ChildItem $rootDir/libgit2 -Recurse
+        Get-ChildItem $libgit2Dir -Recurse
         
-        cd $rootDir
+        cd $PWD
     
     - name: Build Fritzing
       shell: cmd
