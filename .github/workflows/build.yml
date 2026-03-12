@@ -52,16 +52,31 @@ jobs:
         $vcpkgRoot = "C:\vcpkg"
         $zlibRoot = "$vcpkgRoot\installed\x64-windows-static"
         
+        # Verify zlib is installed
+        if (Test-Path "$zlibRoot\include\zlib.h") {
+          Write-Host "Found zlib at $zlibRoot"
+        } else {
+          Write-Host "zlib not found at $zlibRoot, trying x64-windows..."
+          $zlibRoot = "$vcpkgRoot\installed\x64-windows"
+        }
+        
         cd libs/quazip-1.4
         New-Item -ItemType Directory -Force -Path build
         cd build
+        
+        # Set environment variables for cmake
+        $env:ZLIB_ROOT = $zlibRoot
+        $env:ZLIB_LIBRARY = "$zlibRoot\lib\zlib.lib"
+        $env:ZLIB_INCLUDE_DIR = "$zlibRoot\include"
         
         cmake .. `
           -DQUAZIP_QT_MAJOR_VERSION=6 `
           -DCMAKE_BUILD_TYPE=Release `
           -DBUILD_SHARED_LIBS=OFF `
           -DZLIB_LIBRARY="$zlibRoot\lib\zlib.lib" `
-          -DZLIB_INCLUDE_DIR="$zlibRoot\include"
+          -DZLIB_INCLUDE_DIR="$zlibRoot\include" `
+          -DCMAKE_TOOLCHAIN_FILE="$vcpkgRoot\scripts\buildsystems\vcpkg.cmake" `
+          -DVCPKG_TARGET_TRIPLET=x64-windows-static
         
         cmake --build . --config Release --parallel $env:NUMBER_OF_PROCESSORS
         
