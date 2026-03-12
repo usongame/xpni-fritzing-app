@@ -102,18 +102,26 @@ jobs:
     - name: Build ngspice
       shell: powershell
       run: |
-        # Download ngspice pre-built binary for Windows
+        # Try to download ngspice pre-built binary for Windows
         $ngspiceUrl = "https://downloads.sourceforge.net/project/ngspice/ng-spice-rework/42/ngspice-42_dll_64.7z"
-        Invoke-WebRequest -Uri $ngspiceUrl -OutFile ngspice.7z -ErrorAction SilentlyContinue
-        if (Test-Path ngspice.7z) {
-          7z x ngspice.7z -ongspice-win -y
-          New-Item -ItemType Directory -Force -Path libs/ngspice-42/lib
-          New-Item -ItemType Directory -Force -Path libs/ngspice-42/include/ngspice
-          Copy-Item ngspice-win/*.dll libs/ngspice-42/lib/ -ErrorAction SilentlyContinue
-          Copy-Item ngspice-win/*.lib libs/ngspice-42/lib/ -ErrorAction SilentlyContinue
-          Copy-Item ngspice-win/*.h libs/ngspice-42/include/ngspice/ -ErrorAction SilentlyContinue
-        } else {
-          Write-Host "Using stub ngspice library"
+        try {
+          Invoke-WebRequest -Uri $ngspiceUrl -OutFile ngspice.7z -TimeoutSec 120
+          # Check if file is valid (7z magic number)
+          $bytes = Get-Content ngspice.7z -Encoding Byte -TotalCount 6
+          if ($bytes[0] -eq 0x37 -and $bytes[1] -eq 0x7A) {
+            7z x ngspice.7z -ongspice-win -y
+            New-Item -ItemType Directory -Force -Path libs/ngspice-42/lib
+            New-Item -ItemType Directory -Force -Path libs/ngspice-42/include/ngspice
+            Copy-Item ngspice-win/*.dll libs/ngspice-42/lib/ -ErrorAction SilentlyContinue
+            Copy-Item ngspice-win/*.lib libs/ngspice-42/lib/ -ErrorAction SilentlyContinue
+            Copy-Item ngspice-win/*.h libs/ngspice-42/include/ngspice/ -ErrorAction SilentlyContinue
+            Write-Host "ngspice downloaded and extracted successfully"
+          } else {
+            Write-Host "Downloaded file is not a valid 7z archive, skipping ngspice"
+          }
+        } catch {
+          Write-Host "Failed to download ngspice: $_"
+          Write-Host "Circuit simulation will be disabled"
         }
     
     - name: Build Fritzing
