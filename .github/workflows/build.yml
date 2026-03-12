@@ -132,6 +132,7 @@ jobs:
       shell: powershell
       run: |
         # Build libgit2 from source since vcpkg path is not recognized
+        $rootDir = $PWD
         cd libs/libgit2-1.7.1
         New-Item -ItemType Directory -Force -Path build
         cd build
@@ -144,14 +145,18 @@ jobs:
         
         cmake --build . --config Release --parallel $env:NUMBER_OF_PROCESSORS
         
-        # Copy to expected location
-        New-Item -ItemType Directory -Force -Path ../../libgit2/include
-        New-Item -ItemType Directory -Force -Path ../../libgit2/lib
-        Copy-Item Release/git2.lib ../../libgit2/lib/ -ErrorAction SilentlyContinue
-        Copy-Item ../include/git2 ../../libgit2/include/ -Recurse -ErrorAction SilentlyContinue
-        Copy-Item ../include/git2.h ../../libgit2/include/ -ErrorAction SilentlyContinue
+        # Copy to expected location (project root/libgit2)
+        New-Item -ItemType Directory -Force -Path $rootDir/libgit2/include
+        New-Item -ItemType Directory -Force -Path $rootDir/libgit2/lib
+        Copy-Item Release/git2.lib $rootDir/libgit2/lib/ -ErrorAction SilentlyContinue
+        Copy-Item ../include/git2 $rootDir/libgit2/include/ -Recurse -ErrorAction SilentlyContinue
+        Copy-Item ../include/git2.h $rootDir/libgit2/include/ -ErrorAction SilentlyContinue
         
-        cd ../..
+        # List what we created
+        Write-Host "libgit2 files created:"
+        Get-ChildItem $rootDir/libgit2 -Recurse
+        
+        cd $rootDir
     
     - name: Build Fritzing
       shell: cmd
