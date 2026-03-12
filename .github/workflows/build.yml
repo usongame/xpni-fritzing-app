@@ -41,42 +41,55 @@ jobs:
     - name: Install dependencies
       shell: powershell
       run: |
-        # Install dependencies via vcpkg (including zlib for quazip)
-        try { vcpkg install zlib:x64-windows-static boost:x64-windows-static libgit2:x64-windows-static } catch { Write-Host "vcpkg install failed, continuing..." }
-        # Integrate vcpkg with MSBuild
-        try { vcpkg integrate install } catch { Write-Host "vcpkg integrate failed, continuing..." }
+        # Install dependencies via vcpkg
+        try { vcpkg install boost:x64-windows-static libgit2:x64-windows-static } catch { Write-Host "vcpkg install failed, continuing..." }
+    
+    - name: Build zlib
+      shell: powershell
+      run: |
+        # Download and build zlib manually
+        $zlibVersion = "1.3.1"
+        $zlibUrl = "https://github.com/madler/zlib/releases/download/v$zlibVersion/zlib-$zlibVersion.tar.gz"
+        
+        Invoke-WebRequest -Uri $zlibUrl -OutFile zlib.tar.gz
+        tar -xzf zlib.tar.gz
+        
+        cd "zlib-$zlibVersion"
+        New-Item -ItemType Directory -Force -Path build
+        cd build
+        
+        cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF
+        cmake --build . --config Release --parallel $env:NUMBER_OF_PROCESSORS
+        
+        # Install to local directory
+        New-Item -ItemType Directory -Force -Path ../../libs/zlib/lib
+        New-Item -ItemType Directory -Force -Path ../../libs/zlib/include
+        Copy-Item Release/zlibstatic.lib ../../libs/zlib/lib/zlib.lib -ErrorAction SilentlyContinue
+        Copy-Item Release/zlib.lib ../../libs/zlib/lib/ -ErrorAction SilentlyContinue
+        Copy-Item ../zlib.h ../../libs/zlib/include/
+        Copy-Item zconf.h ../../libs/zlib/include/ -ErrorAction SilentlyContinue
+        Copy-Item ../zconf.h.in ../../libs/zlib/include/zconf.h -ErrorAction SilentlyContinue
+        
+        cd ../..
     
     - name: Build quazip
       shell: powershell
       run: |
-        $vcpkgRoot = "C:\vcpkg"
-        $zlibRoot = "$vcpkgRoot\installed\x64-windows-static"
+        $zlibRoot = "$PWD/libs/zlib"
         
-        # Verify zlib is installed
-        if (Test-Path "$zlibRoot\include\zlib.h") {
-          Write-Host "Found zlib at $zlibRoot"
-        } else {
-          Write-Host "zlib not found at $zlibRoot, trying x64-windows..."
-          $zlibRoot = "$vcpkgRoot\installed\x64-windows"
-        }
+        Write-Host "Using zlib at $zlibRoot"
+        Write-Host "zlib.h exists: $(Test-Path $zlibRoot/include/zlib.h)"
         
         cd libs/quazip-1.4
         New-Item -ItemType Directory -Force -Path build
         cd build
         
-        # Set environment variables for cmake
-        $env:ZLIB_ROOT = $zlibRoot
-        $env:ZLIB_LIBRARY = "$zlibRoot\lib\zlib.lib"
-        $env:ZLIB_INCLUDE_DIR = "$zlibRoot\include"
-        
         cmake .. `
           -DQUAZIP_QT_MAJOR_VERSION=6 `
           -DCMAKE_BUILD_TYPE=Release `
           -DBUILD_SHARED_LIBS=OFF `
-          -DZLIB_LIBRARY="$zlibRoot\lib\zlib.lib" `
-          -DZLIB_INCLUDE_DIR="$zlibRoot\include" `
-          -DCMAKE_TOOLCHAIN_FILE="$vcpkgRoot\scripts\buildsystems\vcpkg.cmake" `
-          -DVCPKG_TARGET_TRIPLET=x64-windows-static
+          -DZLIB_LIBRARY="$zlibRoot/lib/zlib.lib" `
+          -DZLIB_INCLUDE_DIR="$zlibRoot/include"
         
         cmake --build . --config Release --parallel $env:NUMBER_OF_PROCESSORS
         
