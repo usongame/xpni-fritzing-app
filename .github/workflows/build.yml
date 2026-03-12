@@ -168,9 +168,9 @@ jobs:
         # Verify critical resource files exist
         Write-Host "Checking resource files..."
         if (Test-Path "resources/parts/core/power.fzp") {
-          Write-Host "✓ resources/parts/core/power.fzp exists"
+          Write-Host "OK: resources/parts/core/power.fzp exists"
         } else {
-          Write-Host "✗ resources/parts/core/power.fzp NOT FOUND"
+          Write-Host "ERROR: resources/parts/core/power.fzp NOT FOUND"
         }
         # List resources directory
         Get-ChildItem resources/parts/core -Filter "*.fzp" | Select-Object -First 5
