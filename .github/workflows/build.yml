@@ -162,12 +162,6 @@ jobs:
         
         cd $PWD
     
-    - name: Fix resource paths for Windows
-      shell: cmd
-      run: |
-        powershell -Command "(Get-Content phoenixresources.qrc) -replace 'resources/', 'resources\\' | Set-Content phoenixresources.qrc"
-        echo "Fixed qrc file path separators"
-    
     - name: Build Fritzing
       shell: cmd
       run: |
