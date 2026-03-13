@@ -163,21 +163,10 @@ jobs:
         cd $PWD
     
     - name: Fix resource paths for Windows
-      shell: powershell
+      shell: cmd
       run: |
-        # Read qrc file and fix paths for Windows
-        $lines = Get-Content phoenixresources.qrc
-        $fixedLines = @()
-        foreach ($line in $lines) {
-          if ($line -match '<file>resources/') {
-            $fixedLine = $line -replace 'resources/([^<]+)', { 'resources\' + $_.Groups[1].Value.Replace('/', '\') }
-            $fixedLines += $fixedLine
-          } else {
-            $fixedLines += $line
-          }
-        }
-        Set-Content phoenixresources.qrc $fixedLines
-        Write-Host "Fixed qrc file path separators"
+        powershell -Command "(Get-Content phoenixresources.qrc) -replace 'resources/', 'resources\\' | Set-Content phoenixresources.qrc"
+        echo "Fixed qrc file path separators"
     
     - name: Build Fritzing
       shell: cmd
