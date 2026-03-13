@@ -165,8 +165,10 @@ jobs:
     - name: Fix resource paths for Windows
       shell: powershell
       run: |
-        # Replace forward slashes with backslashes in qrc file for Windows
-        (Get-Content phoenixresources.qrc) -replace '/', '\' | Set-Content phoenixresources.qrc
+        # Replace forward slashes with backslashes only in <file> paths for Windows
+        $content = Get-Content phoenixresources.qrc -Raw
+        $content = $content -replace '(?<=<file>)resources/([^<]+)', { 'resources\' + $args[0].Groups[1].Value.Replace('/', '\') }
+        Set-Content phoenixresources.qrc $content -NoNewline
         Write-Host "Fixed qrc file path separators"
     
     - name: Build Fritzing
