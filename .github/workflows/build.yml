@@ -162,14 +162,22 @@ jobs:
         
         cd $PWD
     
+    - name: Check repository structure
+      shell: cmd
+      run: |
+        echo "Current directory: %CD%"
+        dir /b
+        echo "---"
+        if exist resources\parts\core\wire.fzp (echo "wire.fzp found") else (echo "wire.fzp NOT FOUND")
+        echo "---"
+        dir resources\parts\core\ 2>nul || echo "Directory not found"
+    
     - name: Pre-compile resources
       shell: cmd
       run: |
         call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
-        echo "Current directory: %CD%"
-        dir /b resources\parts\core\wire.fzp 2>nul && echo "wire.fzp found" || echo "wire.fzp NOT FOUND"
         mkdir release64
-        rcc -name phoenixresources %CD%\phoenixresources.qrc -o %CD%\release64\qrc_phoenixresources.cpp
+        rcc -name phoenixresources phoenixresources.qrc -o release64\qrc_phoenixresources.cpp
         echo "Resources pre-compiled"
     
     - name: Build Fritzing
