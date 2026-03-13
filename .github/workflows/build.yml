@@ -172,6 +172,21 @@ jobs:
         echo "---"
         dir resources\parts\core\ 2>nul || echo "Directory not found"
     
+    - name: Setup ngspice headers
+      shell: cmd
+      run: |
+        if not exist libs\ngspice-42\include\ngspice\sharedspice.h (
+          echo "Creating ngspice stub headers..."
+          mkdir libs\ngspice-42\include\ngspice 2>nul
+          echo /* ngspice stub header */ > libs\ngspice-42\include\ngspice\sharedspice.h
+          echo #ifndef ngspice_sharedspice_h > libs\ngspice-42\include\ngspice\sharedspice.h
+          echo #define ngspice_sharedspice_h >> libs\ngspice-42\include\ngspice\sharedspice.h
+          echo #endif >> libs\ngspice-42\include\ngspice\sharedspice.h
+          echo "Stub header created"
+        ) else (
+          echo "ngspice headers already exist"
+        )
+    
     - name: Pre-compile resources
       shell: cmd
       run: |
