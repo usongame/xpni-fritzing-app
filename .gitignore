@@ -157,7 +157,10 @@ eggs/
 .eggs/
 lib/
 lib64/
+# Note: This 'parts/' rule is for Python build artifacts, not resources/parts
+# We need to explicitly exclude resources/parts from this rule
 parts/
+!resources/parts/
 sdist/
 var/
 wheels/
