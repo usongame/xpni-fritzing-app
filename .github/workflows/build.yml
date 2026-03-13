@@ -173,19 +173,71 @@ jobs:
         dir resources\parts\core\ 2>nul || echo "Directory not found"
     
     - name: Setup ngspice headers
-      shell: cmd
+      shell: powershell
       run: |
-        if not exist libs\ngspice-42\include\ngspice\sharedspice.h (
-          echo "Creating ngspice stub headers..."
-          mkdir libs\ngspice-42\include\ngspice 2>nul
-          echo /* ngspice stub header */ > libs\ngspice-42\include\ngspice\sharedspice.h
-          echo #ifndef ngspice_sharedspice_h > libs\ngspice-42\include\ngspice\sharedspice.h
-          echo #define ngspice_sharedspice_h >> libs\ngspice-42\include\ngspice\sharedspice.h
-          echo #endif >> libs\ngspice-42\include\ngspice\sharedspice.h
-          echo "Stub header created"
-        ) else (
-          echo "ngspice headers already exist"
-        )
+        $ngspiceHeader = "libs/ngspice-42/include/ngspice/sharedspice.h"
+        if (-not (Test-Path $ngspiceHeader)) {
+          Write-Host "Creating ngspice stub headers..."
+          New-Item -ItemType Directory -Force -Path "libs/ngspice-42/include/ngspice" | Out-Null
+          @'
+/* ngspice stub header for Windows build */
+#ifndef ngspice_sharedspice_h
+#define ngspice_sharedspice_h
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/* Basic type definitions */
+typedef struct vecvalues {
+    char* name;
+    double value;
+    double creal;
+    double cimag;
+    int is_scale;
+    int is_complex;
+} vecvalues;
+
+typedef struct vecvaluesall {
+    int veccount;
+    vecvalues* vecsa;
+} vecvaluesall;
+
+typedef struct vecinfo {
+    int number;
+    char* name;
+    int is_real;
+    int pdvec;
+    int pdvecscale;
+} vecinfo;
+
+typedef struct vecinfoall {
+    char* name;
+    char* title;
+    char* date;
+    char* type;
+    int veccount;
+    vecinfo* vecs;
+} vecinfoall;
+
+/* Function prototypes */
+int ngSpice_Init(void*, void*, void*, void*, void*, void*, void*);
+int ngSpice_Command(char*);
+int ngSpice_CurPlot(void);
+char** ngSpice_AllPlots(void);
+char** ngSpice_AllVecs(char*);
+int ngSpice_Running(void);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* ngspice_sharedspice_h */
+'@ | Out-File -FilePath $ngspiceHeader -Encoding ASCII
+          Write-Host "Stub header created at $ngspiceHeader"
+        } else {
+          Write-Host "ngspice headers already exist"
+        }
     
     - name: Pre-compile resources
       shell: cmd
