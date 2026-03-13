@@ -167,7 +167,7 @@ jobs:
       run: |
         call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
         mkdir release64
-        rcc -name phoenixresources phoenixresources.qrc -o release64/qrc_phoenixresources.cpp
+        rcc -name phoenixresources %CD%\phoenixresources.qrc -o %CD%\release64\qrc_phoenixresources.cpp
         echo "Resources pre-compiled"
     
     - name: Build Fritzing
