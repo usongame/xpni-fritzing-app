@@ -51,4 +51,5 @@ SOURCES += src/svg/svgfilesplitter.cpp \
     src/svg/gedaelementparser.cpp \
     src/svg/gedaelementgrammar.cpp \
     src/svg/gedaelementlexer.cpp \
-    $$PWD/../src/svg/svgtext.cpp
+    $$PWD/../src/svg/svgtext.cpp \
+    $$PWD/../libs/Clipper1/6.4.2/clipper.cpp

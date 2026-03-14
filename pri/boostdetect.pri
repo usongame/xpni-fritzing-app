@@ -34,9 +34,9 @@ defined(boost_root, var) {
     # boost_1_54_0 is buggy
 	BOOSTS = 85
     for(boost, BOOSTS) {
-        exists(../../xpni-fritzing-app/libs/boost_1_$${boost}_0) {
+        exists($$_PRO_FILE_PWD_/libs/boost_1_$${boost}_0) {
             LATESTBOOST = $$boost
-            BOOSTPATH = ../xpni-fritzing-app/libs/boost_1_$${boost}_0
+            BOOSTPATH = $$_PRO_FILE_PWD_/libs/boost_1_$${boost}_0
         }
     }
 }
