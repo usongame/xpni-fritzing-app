@@ -15,7 +15,7 @@
 
 
 message("Using fritzing ngspice detect script.")
-NGSPICEPATH = ../libs/ngspice-42
+NGSPICEPATH = $$_PRO_FILE_PWD_/libs/ngspice-42
 NGSPICEPATH = $$absolute_path($${NGSPICEPATH})
 
 exists($$NGSPICEPATH) {
