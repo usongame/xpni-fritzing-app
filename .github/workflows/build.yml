@@ -175,9 +175,14 @@ jobs:
     - name: Setup ngspice headers
       shell: cmd
       run: |
-        if not exist libs\ngspice-42\include\ngspice\sharedspice.h (
+        echo Current directory: %CD%
+        echo Checking for ngspice headers...
+        if exist libs\ngspice-42\include\ngspice\sharedspice.h (
+          echo ngspice headers already exist
+          type libs\ngspice-42\include\ngspice\sharedspice.h
+        ) else (
           echo Creating ngspice stub headers...
-          mkdir libs\ngspice-42\include\ngspice 2>nul
+          if not exist libs\ngspice-42\include\ngspice mkdir libs\ngspice-42\include\ngspice
           echo /* ngspice stub header for Windows build */ > libs\ngspice-42\include\ngspice\sharedspice.h
           echo #ifndef ngspice_sharedspice_h >> libs\ngspice-42\include\ngspice\sharedspice.h
           echo #define ngspice_sharedspice_h >> libs\ngspice-42\include\ngspice\sharedspice.h
@@ -199,8 +204,8 @@ jobs:
           echo #endif >> libs\ngspice-42\include\ngspice\sharedspice.h
           echo #endif >> libs\ngspice-42\include\ngspice\sharedspice.h
           echo Stub header created
-        ) else (
-          echo ngspice headers already exist
+          echo Verifying header file:
+          type libs\ngspice-42\include\ngspice\sharedspice.h
         )
     
     - name: Pre-compile resources
