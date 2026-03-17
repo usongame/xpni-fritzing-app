@@ -60,6 +60,9 @@ libs/**/release/
 libs/**/debug/
 libs/**/install/
 
+# 保留 boost 头文件（boost 有 debug 目录存放头文件）
+!libs/**/boost/**/debug/*.hpp
+
 # libs 中的编译产物（但保留 lib/ 目录中的源码和头文件）
 libs/**/*.o
 libs/**/*.obj
