@@ -245,12 +245,18 @@ jobs:
       shell: cmd
       run: |
         call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+        echo "Current directory: %CD%"
+        echo "Listing libs directory:"
+        dir libs\ 2>nul | findstr "boost" || echo "No boost directory found"
         echo "Checking boost file before build:"
         if exist libs\boost_1_85_0\boost\preprocessor\debug\error.hpp (
           echo "Found: libs\boost_1_85_0\boost\preprocessor\debug\error.hpp"
         ) else (
           echo "ERROR: libs\boost_1_85_0\boost\preprocessor\debug\error.hpp NOT FOUND"
-          dir libs\boost_1_85_0\boost\preprocessor\debug\ 2>nul || echo "Directory not found"
+          echo "Listing libs contents:"
+          dir libs\ 2>nul
+          echo "Listing libs\boost_1_85_0 contents:"
+          dir libs\boost_1_85_0\ 2>nul || echo "boost_1_85_0 directory not found"
         )
         qmake phoenix.pro CONFIG+=release
         nmake /K 2>&1 || (
