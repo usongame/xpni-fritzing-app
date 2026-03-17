@@ -15,6 +15,24 @@ jobs:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Check boost files
+      shell: powershell
+      run: |
+        Write-Host "Checking boost preprocessor files..."
+        $errorFile = "libs/boost_1_85_0/boost/preprocessor/debug/error.hpp"
+        if (Test-Path $errorFile) {
+          Write-Host "Found: $errorFile"
+          Get-Content $errorFile | Select-Object -First 5
+        } else {
+          Write-Host "ERROR: $errorFile not found!"
+          Write-Host "Listing libs/boost_1_85_0/boost/preprocessor/debug/ contents:"
+          Get-ChildItem -Path "libs/boost_1_85_0/boost/preprocessor/debug/" -ErrorAction SilentlyContinue | Select-Object -First 10
+        }
+        Write-Host "Total .hpp files in preprocessor:"
+        (Get-ChildItem -Path "libs/boost_1_85_0/boost/preprocessor/" -Recurse -Filter "*.hpp" -ErrorAction SilentlyContinue).Count
     
     - name: Install Qt
       uses: jurplel/install-qt-action@v4
