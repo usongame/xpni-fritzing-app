@@ -184,7 +184,7 @@ jobs:
         } else {
           Write-Host "Creating ngspice stub headers..."
           New-Item -ItemType Directory -Force -Path "libs/ngspice-42/include/ngspice"
-          @"
+          $headerContent = @'
 /* ngspice stub header for Windows build */
 #ifndef ngspice_sharedspice_h
 #define ngspice_sharedspice_h
@@ -205,7 +205,8 @@ int ngSpice_Running(void);
 }
 #endif
 #endif
-"@ | Out-File -FilePath $headerPath -Encoding ASCII
+'@
+          $headerContent | Out-File -FilePath $headerPath -Encoding ASCII
           Write-Host "Stub header created"
           Write-Host "Verifying header file:"
           Get-Content $headerPath
