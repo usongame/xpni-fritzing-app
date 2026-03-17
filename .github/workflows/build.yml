@@ -184,29 +184,29 @@ jobs:
         } else {
           Write-Host "Creating ngspice stub headers..."
           New-Item -ItemType Directory -Force -Path "libs/ngspice-42/include/ngspice"
-          $headerContent = @'
-/* ngspice stub header for Windows build */
-#ifndef ngspice_sharedspice_h
-#define ngspice_sharedspice_h
-#ifdef __cplusplus
-extern "C" {
-#endif
-typedef struct vecvalues { char* name; double value; double creal; double cimag; int is_scale; int is_complex; } vecvalues;
-typedef struct vecvaluesall { int veccount; vecvalues* vecsa; } vecvaluesall;
-typedef struct vecinfo { int number; char* name; int is_real; int pdvec; int pdvecscale; } vecinfo;
-typedef struct vecinfoall { char* name; char* title; char* date; char* type; int veccount; vecinfo* vecs; } vecinfoall;
-int ngSpice_Init(void*, void*, void*, void*, void*, void*, void*);
-int ngSpice_Command(char*);
-int ngSpice_CurPlot(void);
-char** ngSpice_AllPlots(void);
-char** ngSpice_AllVecs(char*);
-int ngSpice_Running(void);
-#ifdef __cplusplus
-}
-#endif
-#endif
-'@
-          $headerContent | Out-File -FilePath $headerPath -Encoding ASCII
+          $lines = @(
+            "/* ngspice stub header for Windows build */",
+            "#ifndef ngspice_sharedspice_h",
+            "#define ngspice_sharedspice_h",
+            "#ifdef __cplusplus",
+            'extern "C" {',
+            "#endif",
+            "typedef struct vecvalues { char* name; double value; double creal; double cimag; int is_scale; int is_complex; } vecvalues;",
+            "typedef struct vecvaluesall { int veccount; vecvalues* vecsa; } vecvaluesall;",
+            "typedef struct vecinfo { int number; char* name; int is_real; int pdvec; int pdvecscale; } vecinfo;",
+            "typedef struct vecinfoall { char* name; char* title; char* date; char* type; int veccount; vecinfo* vecs; } vecinfoall;",
+            "int ngSpice_Init(void*, void*, void*, void*, void*, void*, void*);",
+            "int ngSpice_Command(char*);",
+            "int ngSpice_CurPlot(void);",
+            "char** ngSpice_AllPlots(void);",
+            "char** ngSpice_AllVecs(char*);",
+            "int ngSpice_Running(void);",
+            "#ifdef __cplusplus",
+            "}",
+            "#endif",
+            "#endif"
+          )
+          $lines | Out-File -FilePath $headerPath -Encoding ASCII
           Write-Host "Stub header created"
           Write-Host "Verifying header file:"
           Get-Content $headerPath
