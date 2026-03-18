@@ -12,7 +12,7 @@ NC='\033[0m' # No Color
 # 获取脚本所在目录
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_NAME="Fritzing"
-VERSION="1.0.0"
+VERSION="1.0.1"
 
 echo -e "${GREEN}========================================${NC}"
 echo -e "${GREEN}  Fritzing 跨平台发布构建脚本${NC}"

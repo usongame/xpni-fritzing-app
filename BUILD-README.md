@@ -79,8 +79,8 @@ run-fritzing.bat
 - Qt 6.5.3 (已安装在 ~/local/Qt6/)
 
 #### 构建输出
-- `dist/Fritzing-1.0.0-macOS.dmg` - DMG 安装包
-- `dist/Fritzing-1.0.0-macOS.zip` - ZIP 压缩包
+- `dist/Fritzing-1.0.1-macOS.dmg` - DMG 安装包
+- `dist/Fritzing-1.0.1-macOS.zip` - ZIP 压缩包
 
 #### 手动构建
 ```bash
@@ -129,8 +129,8 @@ sudo dnf install -y \
 ```
 
 #### 构建输出
-- `dist/Fritzing-1.0.0-linux.tar.gz` - tar.gz 压缩包
-- `dist/Fritzing-1.0.0-Linux.AppImage` - AppImage (如果安装了 linuxdeployqt)
+- `dist/Fritzing-1.0.1-linux.tar.gz` - tar.gz 压缩包
+- `dist/Fritzing-1.0.1-Linux.AppImage` - AppImage (如果安装了 linuxdeployqt)
 
 #### 手动构建
 ```bash
@@ -179,7 +179,7 @@ make -j$(nproc)
    ```
 
 #### 构建输出
-- `dist/Fritzing-1.0.0-Windows.zip` - ZIP 压缩包
+- `dist/Fritzing-1.0.1-Windows.zip` - ZIP 压缩包
 
 ## 发布包内容
 
@@ -227,7 +227,7 @@ sudo apt-get install <missing-library>
 
 ## 版本信息
 
-- Fritzing 版本: 1.0.0
+- Fritzing 版本: 1.0.1
 - Qt 版本: 6.5.3
 - ngspice 版本: 42
 
